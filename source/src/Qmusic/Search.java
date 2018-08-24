@@ -1,5 +1,6 @@
 package Qmusic;
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -18,26 +19,26 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 /**
- * ËÑË÷½á¹û»ñÈ¡½âÎöÀà
+ * æœç´¢ç»“æœè·å–è§£æç±»
  * @author 83588
  */
 public class Search {
-	/** jsonÊı¾İÖĞµÄËÑË÷¹Ø¼ü´Ê */
+	/** jsonæ•°æ®ä¸­çš„æœç´¢å…³é”®è¯ */
 	public String js_keyword;
 
-	/** µ±Ç°ËÑË÷½á¹ûÒ³Ò³Âë */
+	/** å½“å‰æœç´¢ç»“æœé¡µé¡µç  */
 	public int js_curpage;
 
-	/** µ±Ç°ËÑË÷½á¹ûÒ³Êı¾İÁ¿(count) */
+	/** å½“å‰æœç´¢ç»“æœé¡µæ•°æ®é‡(count) */
 	public int js_curnum;
 
-	/** ËÑË÷½á¹û×ÜÊı¾İÁ¿ */
+	/** æœç´¢ç»“æœæ€»æ•°æ®é‡ */
 	public int js_totalnum;
 
-	/** ËÑË÷½á¹ûÒ³×ÜÒ³Âë(count) */
+	/** æœç´¢ç»“æœé¡µæ€»é¡µç (count) */
 	public int js_totalpage;
 
-	/** ÏêÏ¸Êı¾İ¼¯ */
+	/** è¯¦ç»†æ•°æ®é›† */
 	public Media[] list;
 
 	/** Search Result URL */
@@ -45,22 +46,22 @@ public class Search {
 
 	Search(String word, int page) throws ClientProtocolException, IOException {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
-		HttpUriRequest httpUrlRe = new HttpGet(searchStatement + "&w=" + word + "&p=" + page);
+		HttpUriRequest httpUrlRe = new HttpGet(searchStatement + "&w=" + URLEncoder.encode(word) + "&p=" + page);
 		CloseableHttpResponse response = httpClient.execute(httpUrlRe);
 		if (response != null) {
 			HttpEntity entity = response.getEntity();
 			String result = EntityUtils.toString(entity, "UTF-8");
-			//¹¹Ôìjson½âÎöÆ÷¶ÔjsonÊı¾İ½øĞĞ½âÎö
+			//æ„é€ jsonè§£æå™¨å¯¹jsonæ•°æ®è¿›è¡Œè§£æ
 			JsonParser jsParser = new JsonParser();
 			JsonObject jsonOb = (JsonObject) jsParser.parse(result);
 			jsonOb = (JsonObject) jsParser.parse(jsonOb.get("data").toString());
-			js_keyword = jsonOb.get("keyword").getAsString();									//»ñµÃÔÚjsonÊı¾İÖĞµÄËÑË÷¹Ø¼ü´Ê
+			js_keyword = jsonOb.get("keyword").getAsString();									//è·å¾—åœ¨jsonæ•°æ®ä¸­çš„æœç´¢å…³é”®è¯
 			jsonOb = (JsonObject) jsParser.parse(jsonOb.get("song").toString());
-			js_curpage = jsonOb.get("curpage").getAsInt();											//»ñµÃÔÚjsonÊı¾İÖĞµÄµ±Ç°½á¹ûÒ³Ò³Âë
-			js_totalnum = jsonOb.get("totalnum").getAsInt();										//»ñµÃÔÚjsonÊı¾İÖĞµÄËùÓĞËÑË÷½á¹ûÊı¾İÊıÁ¿
+			js_curpage = jsonOb.get("curpage").getAsInt();											//è·å¾—åœ¨jsonæ•°æ®ä¸­çš„å½“å‰ç»“æœé¡µé¡µç 
+			js_totalnum = jsonOb.get("totalnum").getAsInt();										//è·å¾—åœ¨jsonæ•°æ®ä¸­çš„æ‰€æœ‰æœç´¢ç»“æœæ•°æ®æ•°é‡
 			JsonArray jsArr = jsParser.parse(jsonOb.get("list").toString()).getAsJsonArray();
-			js_curnum = jsArr.size();																				//¼ÆËãµ±Ç°ËÑË÷½á¹ûÒ³Êı¾İÊıÁ¿
-			//¶ÔËÑË÷½á¹û×ÜÒ³Âë½øĞĞ¼ÆËã
+			js_curnum = jsArr.size();																				//è®¡ç®—å½“å‰æœç´¢ç»“æœé¡µæ•°æ®æ•°é‡
+			//å¯¹æœç´¢ç»“æœæ€»é¡µç è¿›è¡Œè®¡ç®—
 			if(js_curnum < 20) {
 				js_totalpage = js_curpage;
 			}
@@ -71,7 +72,7 @@ public class Search {
 			
 			int i = 0;
 			list = new Media[js_curnum];
-			//ÓÃjson·µ»ØÊı¾İÖĞµÄlistÊı×é¹¹ÔìMedia¶ÔÏó
+			//ç”¨jsonè¿”å›æ•°æ®ä¸­çš„listæ•°ç»„æ„é€ Mediaå¯¹è±¡
 			for (JsonElement js_ele : jsArr) {
 				list[i] = new Media(js_ele);
 				i++;
@@ -100,7 +101,7 @@ public class Search {
 
 	public static void main(String agrs[])
 			throws ClientProtocolException, IOException, UnsupportedAudioFileException, LineUnavailableException {
-		Search search = new Search("²¡±ä", 2);
+		Search search = new Search("ç—…å˜", 2);
 		search.debugShow();
 		search.list[0].debugShow();
 		//AudioPlay.urlPlay(search.list[0].getMeidaUrl(),	search.list[0].singer.replaceAll(" / ", "&") + " - " + search.list[0].title + ".m4a");
