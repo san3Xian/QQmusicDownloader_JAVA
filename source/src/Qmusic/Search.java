@@ -46,7 +46,7 @@ public class Search {
 
 	Search(String word, int page) throws ClientProtocolException, IOException {
 		CloseableHttpClient httpClient = HttpClients.createDefault();
-		HttpUriRequest httpUrlRe = new HttpGet(searchStatement + "&w=" + URLEncoder.encode(word) + "&p=" + page);
+		HttpUriRequest httpUrlRe = new HttpGet(searchStatement + "&w=" + java.net.URLEncoder.encode(word, "UTF-8") + "&p=" + page);
 		CloseableHttpResponse response = httpClient.execute(httpUrlRe);
 		if (response != null) {
 			HttpEntity entity = response.getEntity();
